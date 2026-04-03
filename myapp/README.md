@@ -74,7 +74,7 @@ GAMESENSE is an advanced sports tracking system designed to provide real-time da
 ### Backend
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/harshitnitjsr/Adobe-GenSolve-Team-Neuron
+git clone https://github.com/dhanushrajulapati/Badmintion-Analyzer.git
 cd Backend
 ```
 
