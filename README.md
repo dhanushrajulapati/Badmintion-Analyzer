@@ -100,8 +100,8 @@
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/harshitnitjsr/Adobe-GenSolve-Team-Neuron
-   cd Adobe-GenSolve-Team-Neuron/Backend
+   git clone https://github.com/dhanushrajulapati/Badmintion-Analyzer.git
+   cd Backend
    ```
 
 2. **Install Dependencies**
@@ -124,7 +124,7 @@
 
 ### Frontend
 
-You can access the live version at [adobe-gen-solve-team-neuron.vercel.app](https://adobe-gen-solve-team-neuron.vercel.app/), or run it locally:
+
 
 1. **Navigate to the Client Directory**
    ```bash
@@ -136,15 +136,9 @@ You can access the live version at [adobe-gen-solve-team-neuron.vercel.app](http
    npm i
    ```
 
-3. **Environment Setup (Gemini API)**
-   - Get a Gemini API key from Google AI Studio.
-   - Create a `.env` file in the `myapp` directory.
-   - Add the following line:
-     ```env
-     NEXT_PUBLIC_GEMINI_KEY=your_gemini_api_key_here
-     ```
 
-4. **Run the Development Server**
+
+3. **Run the Development Server**
    ```bash
    npm run dev
    ```
