@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import { LampContainer } from "./ui/lamp";
 import { CardBody, CardContainer, CardItem } from "../components/ui/3d-card";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
+
 export function LampDemo({ first, children }: any) {
   return (
     <>
       <LampContainer>
-        <motion.h1
+        {/* Changed from motion.h1 to motion.div to fix the hydration error */}
+        <motion.div
           initial={{ opacity: 0.5, y: 100 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{
@@ -21,7 +23,7 @@ export function LampDemo({ first, children }: any) {
           <h1 className="text-lg md:text-7xl text-center font-sans font-bold mb-8 text-white">
             {first}
           </h1>
-        </motion.h1>
+        </motion.div>
       </LampContainer>
       {children}
     </>

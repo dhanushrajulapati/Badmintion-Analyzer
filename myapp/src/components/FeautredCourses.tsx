@@ -4,7 +4,7 @@ import Link from "next/link";
 import { BackgroundGradient } from "./ui/background-gradient";
 
 import Problems from "../data/data.json";
-import { TypewriterEffectSmoothDemo } from "./Name";
+
 
 interface Course {
   id: number;
@@ -23,7 +23,7 @@ function FeautredCourses() {
           </h2> */}
 
           <div className="item">
-            <TypewriterEffectSmoothDemo />
+           
           </div>
         </div>
       </div>

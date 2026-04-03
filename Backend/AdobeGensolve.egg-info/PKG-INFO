@@ -1,7 +1,9 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: AdobeGensolve
 Version: 0.0.1
 Author: Team Neuron
 Requires-Dist: ultralytics
 Requires-Dist: opencv-python-headless
 Requires-Dist: numpy
+Dynamic: author
+Dynamic: requires-dist

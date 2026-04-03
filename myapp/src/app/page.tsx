@@ -28,13 +28,11 @@ export default function Home() {
             <HeroSection />
           </div>
           <div className="ml-8">
-            <ThreeDCardDemo />
+            
           </div>
         </div>
         <FeautredCourses />
-        <Whychooseus />
-        <Testimonial />
-        <MeetOurInstructors />
+       
        
       </main>
     </>

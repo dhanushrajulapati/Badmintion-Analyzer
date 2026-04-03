@@ -27,13 +27,7 @@ function Navbar({ className }: { className?: string }) {
           </Link>
 
         
-        <Link href={"/contact"}>
-          <MenuItem
-            setActive={setActive}
-            active={active}
-            item="Contact Us"
-          ></MenuItem>
-        </Link>
+       
       </Menu>
     </div>
   );

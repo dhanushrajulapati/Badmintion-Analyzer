@@ -6,15 +6,11 @@ import axios from "axios";
 import Link from "next/link";
 import { CardBody, CardContainer, CardItem } from "../../components/ui/3d-card";
 import { BackgroundGradient } from "@/components/ui/background-gradient";
-// import { Spotlight } from "@/components/ui/Spotlight";
-import { TypewriterEffectSmoothDemo } from "@/components/Name";
 import { LampDemo } from "@/components/MyLamp";
-// import { CardSpotlight } from "@/components/ui/card-spotlight";
 import { CardSpotlightDemo } from "@/components/MySpecialCard";
 import { CardSpotlightDemoScore } from "@/components/MyScore";
 import { TextToSpeech } from "@/components/Audio";
 
-// import { run } from "@/helpers/gemini";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { WobbleCardDemo } from "@/components/Commentary";
 import socket from "@/utils/socket";
@@ -25,96 +21,46 @@ export default function Harshit() {
   const [apidata, setApidata] = useState<string | null>(null);
   const [distance, setDistance] = useState<any>(null);
   const [key, setKey] = useState<any>("hello");
-  const hasFetchedData = useRef(false); // Track if data has been fetched
+  const hasFetchedData = useRef(false);
   const [hitby, setHitby] = useState<any>(null);
+  
+  // 1. ADDED: State to track if we are currently fetching to prevent spam
+  const [isFetching, setIsFetching] = useState(false);
+
   useEffect(() => {
     socket.on("update_match_data", (data) => {
       setMatchData(data);
       setHitby(data.HitPlayer);
     });
 
-    // Cleanup on unmount
     return () => {
       socket.off("update_match_data");
     };
   }, []);
-  //   const genAI = new GoogleGenerativeAI({
-  //     apiKey: "AIzaSyDTJ-vtVfU7us69uv1wqz_scHHfmhoPuJU",
-  //   });
-  //   console.log(genAI)
-  //   const model = genAI.getGenerativeModel({
-  //     model: "gemini-1.5-flash",
-  //     systemInstruction: "Generate small and 1 line commentary for the badminton based on my given event and some masala line on this. Masala line and commentary both inclusive make 1 line, not more than that.",
-  //   });
-  //   console.log(model)
-  //   const generationConfig = {
-  //     temperature: 2,
-  //     topP: 0.95,
-  //     topK: 64,
-  //     maxOutputTokens: 8192,
-  //     responseMimeType: "application/json",
-  //   };
-  //   const fetchData = async () => {
-  //     try {
-  //       console.log(generationConfig)
-  //       const chatSession = await model.startChat({
-  //         generationConfig,
-  //         history: [
-  //           {
-  //             role: "user",
-  //             parts: [
-  //               { text: "Smash and player 1 scores 1 and player 2 2" },
-  //             ],
-  //           },
-  //           {
-  //             role: "model",
-  //             parts: [
-  //               { text: "{\"commentary\": \"What a smash! Player 1 connects with a powerful shot, but player 2 responds with two points in a row! This is getting interesting!\"}" },
-  //             ],
-  //           },
-  //         ],
-  //       });
-
-  //       const result = await chatSession.sendMessage("player 1 scores 1 and player 2 4 and smash");
-  //       console.log(result);
-  //       // return result;
-
-  //     } catch (error) {
-  //       // console.log(generationConfig)
-  //       console.error("Error in generating commentary:", error);
-  //       throw error;
-  //     }
-  //   };
-
-  //   //
-
-  // //
-  // const api= process.env.GEMINI_API_KEY
-  // const
 
   useEffect(() => {
     const fetchData = async () => {
-      // let api1=
-      setKey(process.env.NEXT_PUBLIC_GEMINI_KEY!);
-      // console.log(key)
-      const genAI = new GoogleGenerativeAI(
-        "AIzaSyAvguxIaYJqqWNrbtPEEOs7qdTih-5wGio"
-      );
+      // 2. ADDED: If we are already fetching, or matchData isn't ready, stop here.
+      if (isFetching || !matchData) return;
+      
+      setIsFetching(true); // Lock the function so it can't be spammed
+
+      const apiKey = process.env.NEXT_PUBLIC_GEMINI_KEY || "AIzaSyAvguxIaYJqqWNrbtPEEOs7qdTih-5wGio";
+      setKey(apiKey);
+
+      const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: "gemini-1.5-flash",
         systemInstruction:
           "Generate 10 word commentary not more than 10 words. Ensure the commentary is engaging, uses sports jargon, and adds a touch of excitement. Output the generated commentary in JSON format {commentary : data} based on my given inputs . . . and generate different type of commentary every time and use my given numerical datas too. ",
         generationConfig: { responseMimeType: "application/json" },
       });
-      const lastElementPlayer1 =
-        matchData?.scoreArray["Player 1"][
-          matchData?.scoreArray["Player 1"].length - 1
-        ];
-      const lastElementPlayer2 =
-        matchData?.scoreArray["Player 2"][
-          matchData?.scoreArray["Player 2"].length - 1
-        ];
+
+      const lastElementPlayer1 = matchData?.scoreArray["Player 1"]?.[matchData?.scoreArray["Player 1"].length - 1];
+      const lastElementPlayer2 = matchData?.scoreArray["Player 2"]?.[matchData?.scoreArray["Player 2"].length - 1];
+      
       let prompt: string = `Player 1 score is ${lastElementPlayer1?.score} and player 2 score is ${lastElementPlayer2?.score}`;
+      
       if (matchData?.HitPlayer == "Player 1") {
         prompt = `Player 1 hit with the speed of  ${lastElementPlayer1?.speed} at a distance of ${lastElementPlayer1?.distance} and player 1 score is ${lastElementPlayer1?.score} and player 2 score is ${lastElementPlayer2?.score} `;
       }
@@ -122,11 +68,25 @@ export default function Harshit() {
       if (matchData?.HitPlayer == "Player 2") {
         prompt = `Player 2 hit with the speed of  ${lastElementPlayer2?.speed} at a distance of ${lastElementPlayer2?.distance} and player 2 score is ${lastElementPlayer2?.score} and player 1 score is ${lastElementPlayer1?.score} `;
       }
-      const result = await model.generateContent(prompt);
-      const jsonObject = JSON.parse(result.response.text());
 
-      setApidata(jsonObject.commentary);
-      // console.log(jsonObject.commentary);
+      // 3. ADDED: Try/Catch block to gracefully handle 429 Rate Limit Errors
+      try {
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
+        
+        if (responseText) {
+          const jsonObject = JSON.parse(responseText);
+          setApidata(jsonObject.commentary);
+        }
+      } catch (error) {
+        // This stops your app from crashing! It just logs the error instead.
+        console.error("Gemini API Error (Rate Limit likely hit):", error);
+      } finally {
+        // 4. ADDED: Wait 5 seconds before allowing another API call
+        setTimeout(() => {
+          setIsFetching(false);
+        }, 5000); 
+      }
     };
 
     fetchData();
@@ -135,9 +95,6 @@ export default function Harshit() {
   return (
     <>
       <div className="min-h-screen bg-slate-950 py-12 pt-36">
-        {/* <h1>{distance}</h1> */}
-        <TypewriterEffectSmoothDemo />
-
         <LampDemo first={"Video with Analysis"}>
           <div className="flex flex-wrap justify-center">
             <div className="min-h-screen bg-slate-950 py-12 pt-36">
@@ -232,10 +189,6 @@ export default function Harshit() {
                         {"Player 1"}
                       </h1>
                       <div className="flex flex-wrap justify-center gap-7 mt-8">
-                        {/* <h1 className="text-lg md:text-xl  font-sans font-bold mb-8 text-red-600">
-                    Last 6 shots details
-                  </h1> */}
-
                         <br />
                         {matchData?.scoreArray["Player 1"]
                           ?.slice(-4)
@@ -252,7 +205,6 @@ export default function Harshit() {
                               />
                             </BackgroundGradient>
                           ))}
-
                         <br />
                       </div>
                       <br />
@@ -262,10 +214,6 @@ export default function Harshit() {
                         {"Player 2"}
                       </h1>
                       <div className="flex flex-wrap justify-center gap-7 mt-8">
-                        {/* <h1 className="text-lg md:text-xl  font-sans font-bold mb-8 text-red-600">
-                    Last 6 shots details
-                  </h1> */}
-
                         <br />
                         {matchData?.scoreArray["Player 2"]
                           ?.slice(-4)
@@ -282,7 +230,6 @@ export default function Harshit() {
                               />
                             </BackgroundGradient>
                           ))}
-
                         <br />
                       </div>
                     </>
